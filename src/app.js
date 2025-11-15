@@ -51,6 +51,10 @@ class LingoQuestApp {
         document.getElementById('nav-badges').addEventListener('click', () => {
             this.loadPage('badges');
         });
+
+        document.getElementById('nav-chatbot').addEventListener('click', () => {
+            this.loadPage('chatbot');
+        });
     }
 
     // Setup theme toggle
@@ -110,6 +114,9 @@ class LingoQuestApp {
                 break;
             case 'badges':
                 mainContent.innerHTML = renderBadgesView();
+                break;
+            case 'chatbot':
+                mainContent.innerHTML = renderChatbotView();
                 break;
             default:
                 mainContent.innerHTML = renderDashboard();

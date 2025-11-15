@@ -86,6 +86,22 @@ function renderDashboard() {
                 </div>
             </div>
 
+            <!-- Chatbot Quick Access -->
+            <div class="chatbot-quick-access card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; cursor: pointer;" onclick="window.LingoQuest.loadPage('chatbot')">
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px;">
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <div style="font-size: 3rem;">💬</div>
+                        <div>
+                            <h3 style="margin: 0 0 8px 0; color: white;">AI Conversation Partner</h3>
+                            <p style="margin: 0; opacity: 0.9;">Practice natural conversations in banking contexts</p>
+                        </div>
+                    </div>
+                    <button class="btn" style="background: white; color: #667eea; font-weight: 600; padding: 12px 24px;" onclick="event.stopPropagation(); window.LingoQuest.loadPage('chatbot')">
+                        Start Chatting →
+                    </button>
+                </div>
+            </div>
+
             <!-- Modules Section -->
             <div class="modules-section">
                 <div class="section-header">

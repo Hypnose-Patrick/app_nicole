@@ -9,14 +9,24 @@ function renderExerciseCard(exercise, moduleId, lessonId) {
         'vocal': '🎤',
         'quiz': '📝',
         'reading': '📖',
-        'listening': '🎧'
+        'listening': '🎧',
+        'chatbot': '💬'
     };
 
     const icon = typeIcons[exercise.type] || '📚';
 
+    // Special handling for chatbot exercises - redirect to chatbot page
+    const clickHandler = exercise.type === 'chatbot'
+        ? `window.LingoQuest.loadPage('chatbot')`
+        : `window.LingoQuest.loadExerciseView('${moduleId}', '${lessonId}', '${exercise.id}')`;
+
+    const buttonText = exercise.type === 'chatbot'
+        ? 'Start Conversation'
+        : (isCompleted ? 'Retry Exercise' : 'Start Exercise');
+
     return `
         <div class="exercise-card fade-in ${isCompleted ? 'completed' : ''}"
-             onclick="window.LingoQuest.loadExerciseView('${moduleId}', '${lessonId}', '${exercise.id}')">
+             onclick="${clickHandler}">
             <div class="exercise-header">
                 <div class="exercise-icon">${icon}</div>
                 <div class="exercise-info">
@@ -28,7 +38,11 @@ function renderExerciseCard(exercise, moduleId, lessonId) {
                 </div>
             </div>
 
-            ${isCompleted ? `
+            ${exercise.type === 'chatbot' ? `
+                <div class="exercise-status">
+                    <span class="status-badge special">Conversation Mode</span>
+                </div>
+            ` : (isCompleted ? `
                 <div class="exercise-completion">
                     <div class="completion-status">
                         <span class="completion-icon">✓</span>
@@ -43,12 +57,12 @@ function renderExerciseCard(exercise, moduleId, lessonId) {
                 <div class="exercise-status">
                     <span class="status-badge">Not Started</span>
                 </div>
-            `}
+            `)}
 
             <div class="exercise-footer">
                 <button class="btn ${isCompleted ? 'btn-secondary' : 'btn-primary'}"
-                        onclick="event.stopPropagation(); window.LingoQuest.loadExerciseView('${moduleId}', '${lessonId}', '${exercise.id}')">
-                    ${isCompleted ? 'Retry Exercise' : 'Start Exercise'}
+                        onclick="event.stopPropagation(); ${clickHandler}">
+                    ${buttonText}
                 </button>
             </div>
         </div>
