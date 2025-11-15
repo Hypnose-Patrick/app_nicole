@@ -23,7 +23,22 @@ class LingoQuestApp {
                 console.log('✅ Data migrated from LocalStorage');
             }
 
-            // Initialize profile
+            // Check if profile exists (first time user)
+            this.profile = await IndexedDBStorage.getProfile();
+            const isFirstTime = !this.profile || !this.profile.onboardingCompleted;
+
+            if (isFirstTime) {
+                console.log('👋 First time user - showing onboarding');
+                // Hide loader and show onboarding
+                setTimeout(() => {
+                    document.getElementById('app-loader').classList.add('hidden');
+                    document.getElementById('app-content').classList.remove('hidden');
+                    this.showOnboarding();
+                }, 500);
+                return; // Stop initialization here, will continue after onboarding
+            }
+
+            // Initialize profile for returning users
             this.profile = await IndexedDBStorage.initializeProfile();
             console.log('✅ Profile loaded');
 
@@ -77,6 +92,45 @@ class LingoQuestApp {
                 </div>
             `;
         }
+    }
+
+    // Show onboarding screen
+    showOnboarding() {
+        const appContent = document.getElementById('app-content');
+
+        // Setup minimal UI for onboarding
+        this.setupNavigation();
+        this.setupTheme();
+
+        // Inject onboarding screen
+        const onboardingHTML = renderOnboarding();
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = onboardingHTML;
+        document.body.appendChild(tempDiv.firstElementChild);
+    }
+
+    // Complete onboarding and initialize app
+    async completeOnboarding() {
+        console.log('✅ Onboarding completed');
+
+        // Load and cache all data for synchronous access
+        this.profile = await IndexedDBStorage.getProfile();
+        this.progressCache = await IndexedDBStorage.getProgress();
+        this.settingsCache = await IndexedDBStorage.getSettings();
+        this.badgesCache = await IndexedDBStorage.getUnlockedBadges();
+        console.log('✅ Data caches initialized');
+
+        // Initialize backup manager
+        BackupManager.init();
+        console.log('✅ Backup manager initialized');
+
+        // Mark storage as ready
+        this.storageReady = true;
+
+        // Update UI with profile data
+        this.updateProfileUI();
+
+        console.log('✅ LingoQuest ready!');
     }
 
     // Setup navigation
