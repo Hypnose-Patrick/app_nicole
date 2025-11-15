@@ -5,37 +5,78 @@ class LingoQuestApp {
     constructor() {
         this.currentPage = 'dashboard';
         this.profile = null;
+        this.storageReady = false;
     }
 
     // Initialize application
-    init() {
+    async init() {
         console.log('🚀 LingoQuest initializing...');
 
-        // Initialize storage and profile
-        this.profile = StorageManager.initializeProfile();
+        try {
+            // Initialize IndexedDB
+            await IndexedDBStorage.init();
+            console.log('✅ IndexedDB initialized');
 
-        // Update streak
-        StorageManager.updateStreak();
+            // Migrate data from LocalStorage if needed
+            const migrated = await IndexedDBStorage.migrateFromLocalStorage();
+            if (migrated) {
+                console.log('✅ Data migrated from LocalStorage');
+            }
 
-        // Setup navigation
-        this.setupNavigation();
+            // Initialize profile
+            this.profile = await IndexedDBStorage.initializeProfile();
+            console.log('✅ Profile loaded');
 
-        // Setup theme toggle
-        this.setupTheme();
+            // Update streak
+            await IndexedDBStorage.updateStreak();
+            this.profile = await IndexedDBStorage.getProfile(); // Refresh after streak update
 
-        // Update UI with profile data
-        this.updateProfileUI();
+            // Load and cache all data for synchronous access
+            this.progressCache = await IndexedDBStorage.getProgress();
+            this.settingsCache = await IndexedDBStorage.getSettings();
+            this.badgesCache = await IndexedDBStorage.getUnlockedBadges();
+            console.log('✅ Data caches initialized');
 
-        // Load dashboard
-        this.loadPage('dashboard');
+            // Initialize backup manager
+            BackupManager.init();
+            console.log('✅ Backup manager initialized');
 
-        // Hide loader
-        setTimeout(() => {
-            document.getElementById('app-loader').classList.add('hidden');
-            document.getElementById('app-content').classList.remove('hidden');
-        }, 500);
+            // Mark storage as ready
+            this.storageReady = true;
 
-        console.log('✅ LingoQuest ready!');
+            // Setup navigation
+            this.setupNavigation();
+
+            // Setup theme toggle
+            await this.setupTheme();
+
+            // Update UI with profile data
+            this.updateProfileUI();
+
+            // Load dashboard
+            this.loadPage('dashboard');
+
+            // Hide loader
+            setTimeout(() => {
+                document.getElementById('app-loader').classList.add('hidden');
+                document.getElementById('app-content').classList.remove('hidden');
+            }, 500);
+
+            console.log('✅ LingoQuest ready!');
+        } catch (error) {
+            console.error('❌ Error initializing app:', error);
+
+            // Show error message to user
+            document.getElementById('app-loader').innerHTML = `
+                <div class="loader-content">
+                    <h2 style="color: red;">❌ Error</h2>
+                    <p>Failed to initialize the application. Please refresh the page.</p>
+                    <button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem;">
+                        Refresh
+                    </button>
+                </div>
+            `;
+        }
     }
 
     // Setup navigation
@@ -51,12 +92,16 @@ class LingoQuestApp {
         document.getElementById('nav-badges').addEventListener('click', () => {
             this.loadPage('badges');
         });
+
+        document.getElementById('nav-settings').addEventListener('click', () => {
+            this.loadPage('settings');
+        });
     }
 
     // Setup theme toggle
-    setupTheme() {
+    async setupTheme() {
         const themeToggle = document.getElementById('theme-toggle');
-        const settings = StorageManager.getSettings();
+        const settings = await IndexedDBStorage.getSettings();
 
         // Apply saved theme
         if (settings.theme === 'dark') {
@@ -65,22 +110,22 @@ class LingoQuestApp {
         }
 
         // Toggle theme
-        themeToggle.addEventListener('click', () => {
+        themeToggle.addEventListener('click', async () => {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
 
             document.documentElement.setAttribute('data-theme', newTheme);
             themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
 
-            const settings = StorageManager.getSettings();
+            const settings = await IndexedDBStorage.getSettings();
             settings.theme = newTheme;
-            StorageManager.saveSettings(settings);
+            await IndexedDBStorage.saveSettings(settings);
         });
     }
 
     // Update profile UI
-    updateProfileUI() {
-        const profile = StorageManager.getProfile();
+    async updateProfileUI() {
+        const profile = await IndexedDBStorage.getProfile();
 
         document.getElementById('user-name').textContent = profile.name;
         document.getElementById('user-level').textContent = `Level ${profile.level}`;
@@ -110,6 +155,9 @@ class LingoQuestApp {
                 break;
             case 'badges':
                 mainContent.innerHTML = renderBadgesView();
+                break;
+            case 'settings':
+                mainContent.innerHTML = renderSettingsView();
                 break;
             default:
                 mainContent.innerHTML = renderDashboard();

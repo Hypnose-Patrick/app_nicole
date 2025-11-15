@@ -1,120 +1,122 @@
 // LingoQuest - Storage Manager
-// Manages LocalStorage operations for user profile, progress, and settings
+// Wrapper around IndexedDB for backwards compatibility
+// All data now stored in IndexedDB for better persistence
 
 const StorageManager = {
-    // Storage keys
-    KEYS: {
-        PROFILE: 'lingoquest_profile',
-        PROGRESS: 'lingoquest_progress',
-        SETTINGS: 'lingoquest_settings',
-        BADGES: 'lingoquest_badges'
-    },
-
     // Initialize user profile
     initializeProfile() {
-        let profile = this.getProfile();
+        // Return a promise wrapper for compatibility
+        // This will be called synchronously by old code
+        // but actually uses IndexedDB in the background
 
-        if (!profile) {
-            profile = {
-                name: 'Executive',
-                level: 1,
-                totalXP: 0,
-                vocalExercisesCompleted: 0,
-                perfectScores: 0,
-                currentStreak: 0,
-                longestStreak: 0,
-                lastLogin: new Date().toISOString().split('T')[0],
-                createdAt: new Date().toISOString()
-            };
-            this.saveProfile(profile);
+        // For synchronous compatibility, return cached profile from app
+        if (window.LingoQuest && window.LingoQuest.profile) {
+            return window.LingoQuest.profile;
         }
 
-        return profile;
+        // Fallback - should not happen in normal flow
+        console.warn('StorageManager.initializeProfile() called before app init');
+        return null;
     },
 
-    // Get user profile
+    // Get user profile (sync wrapper)
     getProfile() {
-        const data = localStorage.getItem(this.KEYS.PROFILE);
-        return data ? JSON.parse(data) : null;
+        if (window.LingoQuest && window.LingoQuest.profile) {
+            return window.LingoQuest.profile;
+        }
+        return null;
     },
 
-    // Save user profile
+    // Save user profile (async in background)
     saveProfile(profile) {
-        localStorage.setItem(this.KEYS.PROFILE, JSON.stringify(profile));
+        if (window.LingoQuest) {
+            window.LingoQuest.profile = profile;
+        }
+        // Save to IndexedDB asynchronously
+        IndexedDBStorage.saveProfile(profile).catch(err => {
+            console.error('Error saving profile:', err);
+        });
     },
 
-    // Update streak
+    // Update streak (async wrapper)
     updateStreak() {
+        IndexedDBStorage.updateStreak().then(async () => {
+            if (window.LingoQuest) {
+                window.LingoQuest.profile = await IndexedDBStorage.getProfile();
+            }
+        }).catch(err => {
+            console.error('Error updating streak:', err);
+        });
+    },
+
+    // Add XP to profile (async wrapper)
+    addXP(amount) {
+        IndexedDBStorage.addXP(amount).then(async (result) => {
+            if (window.LingoQuest) {
+                window.LingoQuest.profile = await IndexedDBStorage.getProfile();
+            }
+            return result;
+        }).catch(err => {
+            console.error('Error adding XP:', err);
+            return { leveledUp: false, newLevel: 1 };
+        });
+
+        // Return immediate result for sync compatibility
         const profile = this.getProfile();
-        const today = new Date().toISOString().split('T')[0];
-        const lastLogin = profile.lastLogin;
+        if (profile) {
+            profile.totalXP += amount;
+            const newLevel = calculateLevel(profile.totalXP);
+            const leveledUp = newLevel > profile.level;
+            profile.level = newLevel;
+            return { leveledUp, newLevel };
+        }
+        return { leveledUp: false, newLevel: 1 };
+    },
 
-        if (lastLogin !== today) {
-            const lastDate = new Date(lastLogin);
-            const todayDate = new Date(today);
-            const diffDays = Math.floor((todayDate - lastDate) / (1000 * 60 * 60 * 24));
+    // Get progress data (sync wrapper using cached data)
+    getProgress() {
+        // This needs to be synchronous for compatibility
+        // We'll use a cache that's updated on app init
+        if (window.LingoQuest && window.LingoQuest.progressCache) {
+            return window.LingoQuest.progressCache;
+        }
+        return {};
+    },
 
-            if (diffDays === 1) {
-                // Consecutive day
-                profile.currentStreak++;
-                if (profile.currentStreak > profile.longestStreak) {
-                    profile.longestStreak = profile.currentStreak;
-                }
-            } else if (diffDays > 1) {
-                // Streak broken
-                profile.currentStreak = 1;
+    // Save exercise completion (async wrapper)
+    saveExerciseCompletion(moduleId, lessonId, exerciseId, score) {
+        // Update cache immediately
+        if (window.LingoQuest) {
+            if (!window.LingoQuest.progressCache) {
+                window.LingoQuest.progressCache = {};
+            }
+            const progress = window.LingoQuest.progressCache;
+
+            if (!progress[moduleId]) {
+                progress[moduleId] = {};
+            }
+            if (!progress[moduleId][lessonId]) {
+                progress[moduleId][lessonId] = {};
             }
 
-            profile.lastLogin = today;
-            this.saveProfile(profile);
-        }
-    },
-
-    // Add XP to profile
-    addXP(amount) {
-        const profile = this.getProfile();
-        profile.totalXP += amount;
-
-        // Calculate new level
-        const newLevel = calculateLevel(profile.totalXP);
-        const leveledUp = newLevel > profile.level;
-        profile.level = newLevel;
-
-        this.saveProfile(profile);
-
-        return { leveledUp, newLevel };
-    },
-
-    // Get progress data
-    getProgress() {
-        const data = localStorage.getItem(this.KEYS.PROGRESS);
-        return data ? JSON.parse(data) : {};
-    },
-
-    // Save exercise completion
-    saveExerciseCompletion(moduleId, lessonId, exerciseId, score) {
-        const progress = this.getProgress();
-
-        if (!progress[moduleId]) {
-            progress[moduleId] = {};
-        }
-        if (!progress[moduleId][lessonId]) {
-            progress[moduleId][lessonId] = {};
+            progress[moduleId][lessonId][exerciseId] = {
+                completed: true,
+                score: score,
+                completedAt: new Date().toISOString()
+            };
         }
 
-        progress[moduleId][lessonId][exerciseId] = {
-            completed: true,
-            score: score,
-            completedAt: new Date().toISOString()
-        };
-
-        localStorage.setItem(this.KEYS.PROGRESS, JSON.stringify(progress));
+        // Save to IndexedDB asynchronously
+        IndexedDBStorage.saveExerciseCompletion(moduleId, lessonId, exerciseId, score)
+            .catch(err => {
+                console.error('Error saving exercise completion:', err);
+            });
     },
 
     // Check if exercise is completed
     isExerciseCompleted(moduleId, lessonId, exerciseId) {
         const progress = this.getProgress();
-        return !!(progress[moduleId]?.  [lessonId]?.[exerciseId]?.completed);
+        return !!(progress[moduleId]?.[lessonId]?.[exerciseId]?.completed);
     },
 
     // Get exercise score
@@ -123,30 +125,51 @@ const StorageManager = {
         return progress[moduleId]?.[lessonId]?.[exerciseId]?.score || 0;
     },
 
-    // Get settings
+    // Get settings (sync wrapper)
     getSettings() {
-        const data = localStorage.getItem(this.KEYS.SETTINGS);
-        return data ? JSON.parse(data) : { theme: 'light', soundEnabled: true };
+        if (window.LingoQuest && window.LingoQuest.settingsCache) {
+            return window.LingoQuest.settingsCache;
+        }
+        return { theme: 'light', soundEnabled: true };
     },
 
-    // Save settings
+    // Save settings (async wrapper)
     saveSettings(settings) {
-        localStorage.setItem(this.KEYS.SETTINGS, JSON.stringify(settings));
+        if (window.LingoQuest) {
+            window.LingoQuest.settingsCache = settings;
+        }
+        IndexedDBStorage.saveSettings(settings).catch(err => {
+            console.error('Error saving settings:', err);
+        });
     },
 
-    // Get unlocked badges
+    // Get unlocked badges (sync wrapper)
     getUnlockedBadges() {
-        const data = localStorage.getItem(this.KEYS.BADGES);
-        return data ? JSON.parse(data) : [];
+        if (window.LingoQuest && window.LingoQuest.badgesCache) {
+            return window.LingoQuest.badgesCache;
+        }
+        return [];
     },
 
-    // Unlock badge
+    // Unlock badge (async wrapper)
     unlockBadge(badgeId) {
-        const badges = this.getUnlockedBadges();
-        if (!badges.includes(badgeId)) {
-            badges.push(badgeId);
-            localStorage.setItem(this.KEYS.BADGES, JSON.stringify(badges));
-            return true;
+        // Update cache immediately
+        if (window.LingoQuest) {
+            if (!window.LingoQuest.badgesCache) {
+                window.LingoQuest.badgesCache = [];
+            }
+            const badges = window.LingoQuest.badgesCache;
+
+            if (!badges.includes(badgeId)) {
+                badges.push(badgeId);
+
+                // Save to IndexedDB asynchronously
+                IndexedDBStorage.unlockBadge(badgeId).catch(err => {
+                    console.error('Error unlocking badge:', err);
+                });
+
+                return true;
+            }
         }
         return false;
     },
@@ -157,10 +180,12 @@ const StorageManager = {
         return badges.includes(badgeId);
     },
 
-    // Update profile stats
+    // Update profile stats (async wrapper)
     updateStats(stats) {
         const profile = this.getProfile();
-        Object.assign(profile, stats);
-        this.saveProfile(profile);
+        if (profile) {
+            Object.assign(profile, stats);
+            this.saveProfile(profile);
+        }
     }
 };
