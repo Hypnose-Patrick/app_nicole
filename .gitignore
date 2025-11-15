@@ -1,0 +1,22 @@
+# Old files at root (kept for backup)
+/app.js
+/animations.css
+/badge-card.js
+/badge-system.js
+/badges.js
+/badges-view.js
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.log
