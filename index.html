@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="src/styles/animations.css">
     <link rel="stylesheet" href="src/styles/vocal.css">
     <link rel="stylesheet" href="src/styles/badges.css">
+    <link rel="stylesheet" href="src/styles/settings.css">
 </head>
 <body>
     <!-- App Container -->
@@ -43,6 +44,9 @@
                     </button>
                     <button id="nav-badges" class="nav-btn">
                         🏆 Badges
+                    </button>
+                    <button id="nav-settings" class="nav-btn">
+                        ⚙️ Settings
                     </button>
                 </div>
                 <div class="nav-center">
@@ -93,6 +97,8 @@
     <script src="src/data/modules.js"></script>
     <script src="src/data/badges.js"></script>
     <script src="src/utils/storage.js"></script>
+    <script src="src/utils/indexeddb-storage.js"></script>
+    <script src="src/utils/backup-manager.js"></script>
     <script src="src/utils/dilts-engine.js"></script>
     <script src="src/utils/vocal-analyzer.js"></script>
     <script src="src/utils/badge-system.js"></script>
@@ -107,6 +113,7 @@
     <script src="src/pages/exercise-view.js"></script>
     <script src="src/pages/progress-view.js"></script>
     <script src="src/pages/badges-view.js"></script>
+    <script src="src/pages/settings-view.js"></script>
     <script src="src/app.js"></script>
 </body>
 </html>
