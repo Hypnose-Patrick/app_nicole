@@ -1,0 +1,485 @@
+/* LingoQuest - Badges Styles
+   Styles for badge collection and unlock modals */
+
+/* ===== BADGES OVERVIEW ===== */
+.badges-overview {
+    margin-bottom: var(--spacing-xl);
+}
+
+.overview-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.overview-stat {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    text-align: center;
+}
+
+.overview-stat.highlight {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    color: white;
+    border: none;
+}
+
+.collection-progress {
+    padding: var(--spacing-lg);
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-lg);
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    font-weight: 600;
+}
+
+/* ===== TIER BREAKDOWN ===== */
+.tier-breakdown {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+}
+
+.tier-stat-card {
+    background: var(--color-bg-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    border: 1px solid var(--color-border);
+}
+
+.tier-stat-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.tier-emoji {
+    font-size: 1.5rem;
+}
+
+.tier-name {
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.tier-stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.tier-stat-bar {
+    height: 6px;
+    background: var(--color-bg-tertiary);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.tier-stat-fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    transition: width var(--transition-slow);
+}
+
+/* ===== BADGE TIER SECTION ===== */
+.badge-tier-section {
+    margin-bottom: var(--spacing-2xl);
+}
+
+.tier-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+}
+
+.tier-header h2 {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.tier-icon {
+    font-size: 1.75rem;
+}
+
+.tier-count {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+}
+
+/* ===== BADGES GRID ===== */
+.badges-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.badge-card {
+    background: var(--color-bg-primary);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    text-align: center;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+.badge-card.unlocked {
+    border-color: transparent;
+    background: linear-gradient(135deg, var(--color-bg-primary), var(--color-bg-secondary));
+}
+
+.badge-card.locked {
+    opacity: 0.6;
+}
+
+.badge-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.badge-card.unlocked:hover {
+    box-shadow: 0 12px 32px rgba(76, 127, 230, 0.3);
+}
+
+/* ===== TIER COLORS ===== */
+.tier-bronze { border-color: #CD7F32; }
+.tier-silver { border-color: #C0C0C0; }
+.tier-gold { border-color: #FFD700; }
+.tier-platinum { border-color: #E5E4E2; }
+.tier-diamond { border-color: #B9F2FF; }
+
+/* ===== BADGE CARD ELEMENTS ===== */
+.badge-tier-label {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--spacing-md);
+}
+
+.badge-icon-display {
+    font-size: 5rem;
+    line-height: 1;
+    margin: var(--spacing-md) 0;
+    transition: all var(--transition-base);
+}
+
+.badge-icon-display.grayscale {
+    filter: grayscale(100%) opacity(0.5);
+}
+
+.badge-card:hover .badge-icon-display {
+    transform: scale(1.1);
+}
+
+.badge-info {
+    margin: var(--spacing-lg) 0;
+}
+
+.badge-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-text-primary);
+}
+
+.badge-description {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* ===== BADGE STATUS ===== */
+.badge-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    margin-top: var(--spacing-md);
+}
+
+.badge-status.unlocked {
+    background: linear-gradient(135deg, var(--color-success), #059669);
+    color: white;
+}
+
+.badge-status.locked {
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-secondary);
+}
+
+.status-icon {
+    font-size: 1.25rem;
+}
+
+/* ===== BADGE PROGRESS ===== */
+.badge-progress-section {
+    margin-top: var(--spacing-md);
+}
+
+.badge-reward {
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+}
+
+.badge-card.unlocked .badge-reward {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+    color: var(--color-success);
+    font-weight: 600;
+}
+
+/* ===== BADGE UNLOCK MODAL ===== */
+.badge-unlock-modal {
+    max-width: 500px;
+    text-align: center;
+}
+
+.badge-unlock-modal h2 {
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-xl);
+}
+
+.badge-display {
+    padding: var(--spacing-xl);
+    background: linear-gradient(135deg, var(--color-bg-secondary), var(--color-bg-tertiary));
+    border-radius: var(--radius-lg);
+    margin: var(--spacing-xl) 0;
+}
+
+.badge-display .badge-icon {
+    font-size: 6rem;
+    margin-bottom: var(--spacing-lg);
+    animation: bounceIn 0.8s ease-out;
+}
+
+.badge-display h3 {
+    font-size: 1.75rem;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.badge-display p {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+/* ===== BADGE STATS (for Badges View page) ===== */
+.badge-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.badge-stat {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    text-align: center;
+}
+
+.badge-stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    line-height: 1;
+    margin-bottom: var(--spacing-sm);
+}
+
+.badge-stat-label {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+}
+
+/* ===== PAGE HEADER ===== */
+.page-header {
+    margin-bottom: var(--spacing-xl);
+}
+
+.page-header h1 {
+    margin-bottom: var(--spacing-sm);
+}
+
+.page-header .text-secondary {
+    font-size: 1.125rem;
+}
+
+/* ===== SECTION HEADER ===== */
+.section-header {
+    margin-bottom: var(--spacing-lg);
+}
+
+.section-header h2 {
+    margin-bottom: var(--spacing-xs);
+}
+
+/* ===== WELCOME SECTION ===== */
+.welcome-section {
+    margin-bottom: var(--spacing-xl);
+}
+
+.welcome-section h1 {
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+.welcome-subtitle {
+    font-size: 1.125rem;
+    color: var(--color-text-secondary);
+}
+
+/* ===== LEVEL PROGRESS SECTION ===== */
+.level-progress-section {
+    margin-bottom: var(--spacing-xl);
+}
+
+.level-progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.level-progress-header h3 {
+    margin: 0;
+}
+
+.level-progress-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--spacing-md);
+    font-size: 0.875rem;
+}
+
+/* ===== MODULES SECTION ===== */
+.modules-section {
+    margin-bottom: var(--spacing-2xl);
+}
+
+/* ===== QUICK ACTIONS ===== */
+.quick-actions {
+    margin-top: var(--spacing-2xl);
+}
+
+.quick-actions h3 {
+    margin-bottom: var(--spacing-lg);
+}
+
+.action-buttons {
+    display: flex;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    padding: 1rem 1.5rem;
+    background: var(--color-bg-primary);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    color: var(--color-text-primary);
+}
+
+.action-btn:hover {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* ===== MODULE/LESSON COMPLETION BANNER ===== */
+.lesson-completion-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-xl);
+    background: linear-gradient(135deg, var(--color-success), #059669);
+    color: white;
+    margin-top: var(--spacing-xl);
+}
+
+.completion-icon {
+    font-size: 3rem;
+}
+
+.completion-content {
+    flex: 1;
+}
+
+.completion-content h3 {
+    color: white;
+    margin-bottom: var(--spacing-xs);
+}
+
+.completion-content p {
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+}
+
+.lesson-completion-banner .btn {
+    background: white;
+    color: var(--color-success);
+}
+
+.lesson-completion-banner .btn:hover {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .badges-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tier-breakdown {
+        grid-template-columns: 1fr;
+    }
+
+    .badge-icon-display {
+        font-size: 4rem;
+    }
+
+    .lesson-completion-banner {
+        flex-direction: column;
+        text-align: center;
+    }
+}
