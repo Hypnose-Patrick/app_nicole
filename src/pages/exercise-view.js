@@ -95,6 +95,11 @@ function renderExerciseView(moduleId, lessonId, exerciseId) {
                     <p>💡 Click the microphone to start recording your response</p>
                     <p class="text-secondary">Speak clearly and naturally, as if you're addressing a board meeting</p>
                 </div>
+
+                <!-- Real-Time Feedback Panel (Hidden until recording starts) -->
+                <div class="hidden" id="realtime-feedback-container">
+                    <!-- Real-time feedback will be injected here -->
+                </div>
             </div>
 
             <!-- Feedback Section (Hidden until exercise completed) -->
@@ -115,10 +120,12 @@ function renderExerciseView(moduleId, lessonId, exerciseId) {
 // Vocal recording state
 let recognition = null;
 let recordingTimer = null;
+let realtimeFeedbackTimer = null;
 let startTime = null;
 let transcript = '';
 let pauseCount = 0;
 let wordCount = 0;
+let currentExerciseKeywords = [];
 
 // Start recording
 function startRecording(moduleId, lessonId, exerciseId) {
@@ -140,6 +147,12 @@ function startRecording(moduleId, lessonId, exerciseId) {
     wordCount = 0;
     startTime = Date.now();
 
+    // Get exercise keywords
+    const module = MODULES_DATA.find(m => m.id === moduleId);
+    const lesson = module?.lessons.find(l => l.id === lessonId);
+    const exercise = lesson?.exercises.find(e => e.id === exerciseId);
+    currentExerciseKeywords = exercise?.keywords || [];
+
     // UI updates
     document.getElementById('start-recording').classList.add('hidden');
     document.getElementById('stop-recording').classList.remove('hidden');
@@ -149,6 +162,14 @@ function startRecording(moduleId, lessonId, exerciseId) {
         <div class="status-text">Recording in progress...</div>
     `;
 
+    // Show and initialize real-time feedback panel
+    const realtimeContainer = document.getElementById('realtime-feedback-container');
+    if (realtimeContainer) {
+        realtimeContainer.innerHTML = RealtimeFeedback.render();
+        realtimeContainer.classList.remove('hidden');
+        RealtimeFeedback.reset();
+    }
+
     // Start timer
     recordingTimer = setInterval(() => {
         const elapsed = Math.floor((Date.now() - startTime) / 1000);
@@ -157,6 +178,13 @@ function startRecording(moduleId, lessonId, exerciseId) {
         document.getElementById('timer-value').textContent =
             `${minutes}:${seconds.toString().padStart(2, '0')}`;
     }, 100);
+
+    // Start real-time feedback updates (every 500ms)
+    realtimeFeedbackTimer = setInterval(() => {
+        if (transcript) {
+            RealtimeFeedback.updateMetrics(transcript, startTime, currentExerciseKeywords);
+        }
+    }, 500);
 
     // Recognition events
     recognition.onresult = (event) => {
@@ -175,6 +203,9 @@ function startRecording(moduleId, lessonId, exerciseId) {
         if (finalTranscript) {
             transcript += finalTranscript;
             wordCount = transcript.trim().split(/\s+/).length;
+
+            // Update real-time feedback immediately when we get final transcript
+            RealtimeFeedback.updateMetrics(transcript, startTime, currentExerciseKeywords);
         }
     };
 
@@ -197,6 +228,13 @@ function stopRecording() {
 
     recognition.stop();
     clearInterval(recordingTimer);
+    clearInterval(realtimeFeedbackTimer);
+
+    // Hide real-time feedback panel
+    const realtimeContainer = document.getElementById('realtime-feedback-container');
+    if (realtimeContainer) {
+        realtimeContainer.classList.add('hidden');
+    }
 
     const duration = Math.floor((Date.now() - startTime) / 1000);
     const wpm = Math.round((wordCount / duration) * 60);
