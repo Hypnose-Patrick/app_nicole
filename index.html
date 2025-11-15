@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LingoQuest - Professional English for Banking Executives</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Master boardroom English with AI-powered vocal training">
+    <meta name="theme-color" content="#4c7fe6">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎤</text></svg>">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/components.css">
+    <link rel="stylesheet" href="src/styles/animations.css">
+    <link rel="stylesheet" href="src/styles/vocal.css">
+    <link rel="stylesheet" href="src/styles/badges.css">
+</head>
+<body>
+    <!-- App Container -->
+    <div id="app">
+        <!-- Loading Screen -->
+        <div id="app-loader" class="loader-screen">
+            <div class="loader-content">
+                <div class="loader-spinner"></div>
+                <h2>LingoQuest</h2>
+                <p>Loading your executive English training...</p>
+            </div>
+        </div>
+
+        <!-- Main App Content -->
+        <div id="app-content" class="hidden">
+            <!-- Top Navigation -->
+            <nav id="app-nav" class="top-nav">
+                <div class="nav-left">
+                    <button id="nav-dashboard" class="nav-btn active">
+                        📊 Dashboard
+                    </button>
+                    <button id="nav-progress" class="nav-btn">
+                        📈 Progress
+                    </button>
+                    <button id="nav-badges" class="nav-btn">
+                        🏆 Badges
+                    </button>
+                </div>
+                <div class="nav-center">
+                    <h1 class="app-title">LingoQuest</h1>
+                </div>
+                <div class="nav-right">
+                    <button id="theme-toggle" class="icon-btn" title="Toggle dark mode">
+                        🌙
+                    </button>
+                    <div class="user-profile">
+                        <div class="user-avatar">👤</div>
+                        <div class="user-info">
+                            <span class="user-name" id="user-name">Executive</span>
+                            <span class="user-level" id="user-level">Level 1</span>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Main Content Area -->
+            <main id="main-content" class="main-content">
+                <!-- Pages will be injected here -->
+            </main>
+
+            <!-- XP Notification Toast -->
+            <div id="xp-toast" class="xp-toast hidden">
+                <span class="xp-icon">✨</span>
+                <span class="xp-text">+<span id="xp-amount">0</span> XP</span>
+            </div>
+
+            <!-- Badge Unlock Modal -->
+            <div id="badge-modal" class="modal hidden">
+                <div class="modal-overlay"></div>
+                <div class="modal-content badge-unlock-modal">
+                    <h2>🎉 Badge Unlocked!</h2>
+                    <div class="badge-display">
+                        <div class="badge-icon" id="modal-badge-icon">🏅</div>
+                        <h3 id="modal-badge-name">Badge Name</h3>
+                        <p id="modal-badge-description">Badge description</p>
+                    </div>
+                    <button id="close-badge-modal" class="btn btn-primary">Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="src/data/modules.js"></script>
+    <script src="src/data/badges.js"></script>
+    <script src="src/utils/storage.js"></script>
+    <script src="src/utils/dilts-engine.js"></script>
+    <script src="src/utils/vocal-analyzer.js"></script>
+    <script src="src/utils/badge-system.js"></script>
+    <script src="src/components/module-card.js"></script>
+    <script src="src/components/lesson-card.js"></script>
+    <script src="src/components/exercise-card.js"></script>
+    <script src="src/components/feedback-panel.js"></script>
+    <script src="src/components/badge-card.js"></script>
+    <script src="src/pages/dashboard.js"></script>
+    <script src="src/pages/module-view.js"></script>
+    <script src="src/pages/lesson-view.js"></script>
+    <script src="src/pages/exercise-view.js"></script>
+    <script src="src/pages/progress-view.js"></script>
+    <script src="src/pages/badges-view.js"></script>
+    <script src="src/app.js"></script>
+</body>
+</html>
